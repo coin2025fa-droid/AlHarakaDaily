@@ -35,15 +35,18 @@ jobs:
       - name: Find Gradle project
         run: |
           GRADLE_FILE=$(find project -name settings.gradle -o -name settings.gradle.kts | head -n 1)
-          if [ -z "$GRADLE_FILE" ]; then
-            echo "Gradle settings file not found"
-            exit 1
-          fi
           PROJECT_DIR=$(dirname "$GRADLE_FILE")
           echo "PROJECT_DIR=$PROJECT_DIR" >> $GITHUB_ENV
 
-      - name: Fix Gradle properties
+      - name: Fix Gradle files
         run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          for p in Path("project").rglob("*"):
+              if p.is_file() and (p.name.endswith(".gradle") or p.name.endswith(".gradle.kts")):
+                  s = p.read_text()
+                  p.write_text(s.replace("\\n", "\n"))
+          PY
           printf 'org.gradle.jvmargs=-Xmx2048m -Dfile.encoding=UTF-8\nandroid.useAndroidX=true\n' > "$PROJECT_DIR/gradle.properties"
 
       - name: Build APK
