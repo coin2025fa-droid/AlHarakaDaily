@@ -42,6 +42,10 @@ jobs:
           PROJECT_DIR=$(dirname "$GRADLE_FILE")
           echo "PROJECT_DIR=$PROJECT_DIR" >> $GITHUB_ENV
 
+      - name: Fix Gradle properties
+        run: |
+          printf 'org.gradle.jvmargs=-Xmx2048m -Dfile.encoding=UTF-8\nandroid.useAndroidX=true\n' > "$PROJECT_DIR/gradle.properties"
+
       - name: Build APK
         run: gradle -p "$PROJECT_DIR" assembleDebug
 
