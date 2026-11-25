@@ -32,11 +32,21 @@ jobs:
           mkdir project
           unzip -q AlHarakaDaily_Android_Project.zip -d project
 
+      - name: Find Gradle project
+        run: |
+          GRADLE_FILE=$(find project -name settings.gradle -o -name settings.gradle.kts | head -n 1)
+          if [ -z "$GRADLE_FILE" ]; then
+            echo "Gradle settings file not found"
+            exit 1
+          fi
+          PROJECT_DIR=$(dirname "$GRADLE_FILE")
+          echo "PROJECT_DIR=$PROJECT_DIR" >> $GITHUB_ENV
+
       - name: Build APK
-        run: gradle -p project assembleDebug
+        run: gradle -p "$PROJECT_DIR" assembleDebug
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: AlHarakaDaily-APK
-          path: project/app/build/outputs/apk/debug/app-debug.apk
+          path: project/**/app/build/outputs/apk/debug/app-debug.apk
