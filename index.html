@@ -51,5 +51,13 @@ function csv(){let a=[['التاريخ','النوع','الشركة','اللتر'
 async function importBackup(){if(role!=='admin'){alert('الاستيراد للمدير فقط.');return}let f=$('backupFile').files[0];if(!f){alert('اختر ملف JSON أولاً.');return}try{let old=JSON.parse(await f.text()),payload=[];for(let [d,r] of Object.entries(old)){let p=r.purchases||[{company:'',qty:r.buy||0,desc:r.buyDesc||''}],s=r.sales||[{company:'',qty:r.sell||0,desc:r.sellDesc||''}];for(let x of p)if(n(x.qty)>0)payload.push({movement_date:d,movement_type:'purchase',company_name:x.company||'غير محدد',liters:n(x.qty),description:x.desc||'',created_by:user.id});for(let x of s)if(n(x.qty)>0)payload.push({movement_date:d,movement_type:'sale',company_name:x.company||'غير محدد',liters:n(x.qty),description:x.desc||'',created_by:user.id})}if(!payload.length){status('importMsg','لم أجد فواتير بكميات في الملف.',false);return}if(!confirm('سيتم إضافة '+payload.length+' فاتورة إلى السحابة. لن نحذف الحركات الموجودة. متابعة؟'))return;for(let i=0;i<payload.length;i+=300){let {error}=await db.from('daily_movements').insert(payload.slice(i,i+300));if(error){status('importMsg','توقف الاستيراد عند دفعة: '+error.message,false);return}}status('importMsg','تم استيراد '+payload.length+' فاتورة بنجاح.');await refresh()}catch(e){status('importMsg','الملف غير صالح أو تعذر قراءته.',false)}}
 $('day').value=today();
 setupAuth();
-if(window.Android&&Android.printPage){window.print=()=>Android.printPage();}
-</script></body></html>
+
+if (!window.supabase) {
+  status('loginMsg','مكتبة الاتصال لم يتم تحميلها. تحقق من الإنترنت.',false);
+} else {
+  status('loginMsg','تم تحميل مكتبة الاتصال. يمكنك تسجيل الدخول.');
+}
+
+if(window.Android&&Android.printPage){
+  window.print=()=>Android.printPage();
+}
