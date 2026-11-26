@@ -1,3 +1,11 @@
 name: Android CI
+
 on:
   workflow_dispatch:
+
+jobs:
+  disabled:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Disabled
+        run: echo "Use build-apk.yml instead"
