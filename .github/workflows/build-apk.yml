@@ -60,3 +60,4 @@ jobs:
         with:
           name: AlHarakaDaily-APK
           path: project/**/app/build/outputs/apk/debug/app-debug.apk
+          
